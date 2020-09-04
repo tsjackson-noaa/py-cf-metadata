@@ -8,6 +8,13 @@ import html
 from typing import List
 import warnings
 
+# sentinel value for uninitialized/unset version number
+_UNINIT_V = -1 
+# sentinel value for processing the "current" version: in the cf conventions
+# this is always a copy of the highest numbered version, but we still process it
+# to verify it's free of errors
+_CURRENT_V = 0
+
 class CFBase(object):
     # Tag type in the CF convention tables to use to initialize object instances
     # in the vaf_from_xml() method (defined in child classes.)
@@ -100,14 +107,12 @@ class RevisionHistoryWrapper():
     revision_end: list
     WrappedDataclass: dc.InitVar = None
 
-    uninit_v = -1 # sentinel value for uninitialized/unset version number
-
     @classmethod
     def from_struct(cls, struct):
         obj = cls(revisions=[], revision_start=[], revision_end=[])
         for d in struct:
             start_v = d.pop('revision_start')
-            end_v = d.pop('revision_end', cls.uninit_v)
+            end_v = d.pop('revision_end', _UNINIT_V)
             wrapped_obj = cls.WrappedDataclass.from_struct(d)
             obj.new_revision(wrapped_obj, start_v, end_v)
         return obj
@@ -116,7 +121,7 @@ class RevisionHistoryWrapper():
         def _rev_to_dict(wrapped_obj, start, end):
             d = wrapped_obj.to_struct()
             d['revision_start'] = start
-            if end != self.uninit_v:
+            if end != _UNINIT_V:
                 d['revision_end'] = end
             return d
 
@@ -127,7 +132,7 @@ class RevisionHistoryWrapper():
     def from_obj(cls, wrapped_obj, start_v):
         return cls(
             revisions=[wrapped_obj], 
-            revision_start=[start_v], revision_end=[cls.uninit_v],
+            revision_start=[start_v], revision_end=[_UNINIT_V],
             WrappedDataclass=wrapped_obj.__class__
         )
 
@@ -137,12 +142,12 @@ class RevisionHistoryWrapper():
         self.revisions.append(new_rev)
         self.revision_start.append(current_v)
         if end_v is None:
-            self.revision_end.append(self.uninit_v)
+            self.revision_end.append(_UNINIT_V)
         else:
             self.revision_end.append(end_v)
 
     def end_revision(self, current_v):
-        if self.revision_end[-1] == self.uninit_v:
+        if self.revision_end[-1] == _UNINIT_V:
             self.revision_end[-1] = current_v - 1
 
     def update(self, x, current_v):
@@ -173,7 +178,7 @@ class RevisionHistoryWrapper():
         return (len(self.revisions) == 0)
 
     def filter_by_version(self, version):
-        not_current = (self.revision_end[-1] != self.uninit_v)
+        not_current = (self.revision_end[-1] != _UNINIT_V)
         idx = bisect.bisect_right(self.revision_start, version)
         if idx == 0:
             # before earliest revision containing this entry
@@ -247,25 +252,30 @@ class RevisionDateList(object):
         return {k: v.isoformat() for k, v in self._d.items()}
 
     def add_modified_date_from_xml(self, xml_root, current_version):
-        val = None
+        if current_version == _CURRENT_V:
+            mod_dt = datetime.date.today()
+        else:
+            mod_dt = None
         fld = xml_root.find('last_modified')
-        if fld is not None and val is None:
+        if fld is not None and mod_dt is None:
             # current date tag format used by CF conventions
             try:
                 dt = datetime.datetime.strptime(fld.text, '%Y-%m-%dT%H:%M:%SZ')
             except ValueError:
                 dt = datetime.datetime.strptime(fld.text, '%Y-%m-%dT%H:%MZ')
-            val = dt.date()
+            mod_dt = dt.date()
         fld = xml_root.find('date')
-        if fld is not None and val is None:
+        if fld is not None and mod_dt is None:
             # older date tag format used by CF conventions
             dt = datetime.datetime.strptime(fld.text, '%d %B %Y')
-            val = dt.date()
-        if val is None:
+            mod_dt = dt.date()
+        if mod_dt is None:
             warnings.warn("Couldn't find modification date in file {}.".format(
                 current_version))
-            val = datetime.date(1900,1,1) # dummy value so that lookup will work
-        self._d[str(current_version)] = val
+            # If date not given, assign dummy value so that lookup will work
+            mod_dt = datetime.date(1900,1,1) 
+
+        self._d[str(current_version)] = mod_dt
 
     def date_from_version(self, version):
         return self._d.get(str(version), None)

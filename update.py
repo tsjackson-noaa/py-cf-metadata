@@ -19,6 +19,7 @@ import warnings
 import xml.etree.ElementTree as ET
 
 from py_cf_metadata.classdefs import (
+    _CURRENT_V, _UNINIT_V
     StandardName, AreaType, StandardizedRegion,
     StandardNameAlias, StandardNameAliasAMIP, StandardNameAliasGRIB,
     RevisionHistoryWrapper,
@@ -33,7 +34,7 @@ class XMLProcessor(abc.ABC):
         self.DataClass = DataClass
         self.rev_history_d = self.dict_factory()
         self.rev_dates = RevisionDateList()
-        self.max_version = -1
+        self.max_version = _UNINIT_V
 
     @abc.abstractmethod
     def xml_path(self, version_str):
@@ -87,7 +88,7 @@ class XMLProcessor(abc.ABC):
             self.rev_history_d[k].end_revision(update_version)
         for k in update_keys.difference(d_keys):
             # entries in update_d not in ref_d : add them.
-            if update_version == 0:
+            if update_version == _CURRENT_V:
                 # data in "current" should be a duplicate of most current 
                 # numbered version, so shouldn't be adding anything then
                 warnings.warn("Modifications made to {} in 'current'".format(k))
@@ -106,7 +107,7 @@ class XMLProcessor(abc.ABC):
     def process(self):
         v_strs, self.max_version = self.get_versions(self.xml_dir)
         for v_str in v_strs:
-            v_int = (0 if v_str == 'current' else int(v_str))
+            v_int = (_CURRENT_V if v_str == 'current' else int(v_str))
             print(v_str, end=" ")
             xml_path = self.xml_path(v_str)
             assert os.path.exists(xml_path)
@@ -219,7 +220,7 @@ def write_json(dir_, category_name, xml_proc, prov_d):
     if os.path.exists(path):
         print('Overwriting {}'.format(path))
     prov_copy = prov_d.copy()
-    prov_copy['current_cf_revision'] = str(xml_proc.max_version)
+    prov_copy['current_revision'] = str(xml_proc.max_version)
     prov_copy['dataclass'] = xml_proc.DataClass.__name__
     out_d = {
         'provenance': prov_copy,
