@@ -9,11 +9,13 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
+c
 develop-eggs/
 dist/
 downloads/
 eggs/
 .eggs/
+env/
 lib/
 lib64/
 parts/
@@ -25,6 +27,8 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.orig
+*.tmp
 MANIFEST
 
 # PyInstaller
@@ -50,23 +54,6 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
 
 # Sphinx documentation
 docs/_build/
@@ -94,13 +81,6 @@ ipython_config.py
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
 __pypackages__/
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
 # Environments
 .env
 .venv
@@ -109,6 +89,50 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Pyre type checker
+.pyre/
+
+# Created by text editors
+*~
+\#*
+\.\#*
+*.swp
+
+# IDEs
+.vscode
+.project
+.pydevproject
+.settings
+.idea/
+
+# Data files
+*.nc
+*.nc4
+*.grb
+*.grib
+*.RData
+*.Rdata
+*.Rhistory
+*.rdata
+*.pkl
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
 
 # Spyder project settings
 .spyderproject
@@ -125,5 +149,9 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
-# Pyre type checker
-.pyre/
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
