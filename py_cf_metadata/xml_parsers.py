@@ -10,6 +10,10 @@ from classdefs import (
 )
 
 class XMLProcessor(abc.ABC):
+    """Base class for reading and parsing XMLs from the cf-convention.github.io
+    repo. Entries in the XML are parsed into versioned instances of the
+    ``DataClass`` class.
+    """
     dict_factory = dict
 
     def __init__(self, xml_dir, DataClass):
@@ -21,9 +25,14 @@ class XMLProcessor(abc.ABC):
 
     @abc.abstractmethod
     def xml_path(self, version_str):
+        """Abstract method. Returns the subdirectory in the cf-convention.github.io
+        repo where the XMLs defining the child class' type of data are stored.
+        """
         pass
 
     def get_versions(self, path):
+        """Obtain list of CF standard revision numbers from XML files in ``path``.
+        """
         with os.scandir(path) as iter_:
             version_dirs = [d.name for d in iter_ if \
                 d.is_dir() and not (d.name.startswith('.') or d.name == 'docs')]
@@ -31,6 +40,9 @@ class XMLProcessor(abc.ABC):
 
     @staticmethod
     def v_cleanup(version_strs):
+        """Munge list of CF standard revision numbers gathered from XML file 
+        names.
+        """
         assert 'current' in version_strs
         version_strs.remove('current')
         version_ints = sorted([int(d) for d in version_strs])
@@ -55,6 +67,12 @@ class XMLProcessor(abc.ABC):
         return it.root
 
     def dict_update(self, update_d, update_version):
+        """Update internal data (a dict of 
+        :class:`~classdefs.RevisionHistoryWrapper` objects) with changes from 
+        the revision of the CF standard we just read. Entries that were dropped 
+        have their ``end_revision`` attribute set; new entries have new objects
+        created.
+        """
         d_keys = set(self.rev_history_d.keys())
         update_keys = set(update_d.keys())
         for k in d_keys.intersection(update_keys):
@@ -77,7 +95,6 @@ class XMLProcessor(abc.ABC):
                 warnings.warn("Modifications made to {} in 'current'".format(k))
             if k in self.rev_history_d and self.rev_history_d[k] != update_d[k]:
                 # if we already added this entry, that's a problem
-                #raise KeyError(
                 warnings.warn(
                     'Multiple assignments to {} in version {}\nCurrent: {}\nNew: {}'.format(
                         k, update_version, 
@@ -88,6 +105,8 @@ class XMLProcessor(abc.ABC):
             #     k, update_version, self.rev_history_d[k], update_d[k]))
 
     def process(self):
+        """Read and parse all XML files (ie all revision numbers).
+        """
         v_strs, self.max_version = self.get_versions(self.xml_dir)
         for v_str in v_strs:
             v_int = (_CURRENT_V if v_str == 'current' else int(v_str))
@@ -120,18 +139,25 @@ class XMLProcessor(abc.ABC):
         self.rev_history_d = dict(sorted(self.rev_history_d.items()))
 
 class StdNameXMLProcessor(XMLProcessor):
+    """:class:`XMLProcessor` for parsing CF standard names and standard name 
+    aliases.
+    """
     def xml_path(self, v_str):
         return os.path.join(
             self.xml_dir, v_str, 'src', 'cf-standard-name-table.xml'
         )
 
 class AreaTypeXMLProcessor(XMLProcessor):
+    """:class:`XMLProcessor` for parsing CF area types.
+    """
     def xml_path(self, v_str):
         return os.path.join(
             self.xml_dir, v_str, 'src', 'area-type-table.xml'
         )
 
 class StdRegionXMLProcessor(XMLProcessor):
+    """:class:`XMLProcessor` for parsing CF standard regions.
+    """
     def get_versions(self, path):
         glob_ = 'standardized-region-list.*.xml'
         files = glob.glob(os.path.join(path, glob_))

@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+"""Script to parse XML files of CF convention terminology from a local checkout
+of `https://github.com/cf-convention/cf-convention.github.io`__ and output the
+information into the more compact JSON format in /tables.
+"""
 
 import sys
 # do version check before importing other stuff
@@ -63,6 +67,9 @@ def git_info(repo_dir=None):
     return (git_hash, git_branch)
 
 def provenance_dict(repo_dir, upstream_repo_dir):
+    """Obtain provenance info (modification date and git commit) to include in
+    metadata for output JSON files.
+    """
     now_ = datetime.datetime.now(tz=datetime.timezone.utc)
     my_hash, my_branch = git_info(repo_dir)
     up_hash, up_branch = git_info(upstream_repo_dir)

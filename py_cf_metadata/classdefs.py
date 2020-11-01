@@ -16,6 +16,9 @@ _UNINIT_V = -1
 _CURRENT_V = 0
 
 class CFBase(object):
+    """Base class for instantiating CF convention dataclasses from entries in
+    the the cf-convention.github.io XMLs.
+    """
     # Tag type in the CF convention tables to use to initialize object instances
     # in the vaf_from_xml() method (defined in child classes.)
     xml_tag = "entry"
@@ -102,6 +105,13 @@ class CFBase(object):
 
 @dc.dataclass
 class RevisionHistoryWrapper():
+    """Class that wraps the CF convention dataclasses to provide revision 
+    information.
+
+    - ``revision_start`` is the first revision number of the CF standard in 
+        which the given entry is present.
+    - ``revision_end`` is the final revision number on which it's present. 
+    """
     revisions: list
     revision_start: list
     revision_end: list
@@ -236,6 +246,10 @@ class StandardNameAliasGRIB(CFBase):
 # --------------------------------------------------------------
 
 class RevisionDateList(object):
+    """Class to do bookkeeping of revision dates for the cf-convention.github.io
+    XMLs. Essentially wraps a dict (``_d``) whose keys are revision numbers of 
+    the CF standard and whose values are the dates that revision was published.
+    """
     def __init__(self, d=None):
         if d is None:
             self._d = dict()
@@ -244,14 +258,23 @@ class RevisionDateList(object):
 
     @classmethod
     def from_struct(cls, d):
+        """Instantiate from a struct, eg. as read in from one of the JSON files
+        in /tables.
+        """
         return cls({
             k: datetime.date.fromisoformat(v) for k,v in d.items()
         })
 
     def to_struct(self):
+        """Return contents in form suitable for writing to JSON.
+        """
         return {k: v.isoformat() for k, v in self._d.items()}
 
     def add_modified_date_from_xml(self, xml_root, current_version):
+        """Find and add the modification date on the current 
+        cf-convention.github.io XML. Different revisions of the XMLs include 
+        this date in different formats, so we have logic to handle them all.
+        """
         if current_version == _CURRENT_V:
             mod_dt = datetime.date.today()
         else:
@@ -278,9 +301,14 @@ class RevisionDateList(object):
         self._d[str(current_version)] = mod_dt
 
     def date_from_version(self, version):
+        """Lookup date given revision number.
+        """
         return self._d.get(str(version), None)
 
     def version_from_date(self, dt):
+        """Lookup the revision number which was current on a given date, using
+        bisection search.
+        """
         keys = list(self._d.keys())
         dts = list(self._d.values())
         if dts != sorted(dts):
