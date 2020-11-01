@@ -4,7 +4,7 @@ import glob
 import warnings
 import xml.etree.ElementTree as ET
 
-from classdefs import (
+from .classdefs import (
     _CURRENT_V, _UNINIT_V,
     RevisionHistoryWrapper, RevisionDateList
 )
@@ -57,8 +57,7 @@ class XMLProcessor(abc.ABC):
         """
         it = ET.iterparse(file_)
         for _, el in it:
-            for _, el in it:
-                _, _, el.tag = el.tag.rpartition('}') # strip namespaces
+            _, _, el.tag = el.tag.rpartition('}') # strip namespaces
             for at in el.attrib: # strip namespaces of attributes too
                 if '}' in at:
                     newat = at.split('}', 1)[1]
