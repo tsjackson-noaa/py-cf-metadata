@@ -1,0 +1,42 @@
+{
+  "provenance": {
+    "last_modified": "2020-11-01T21:15:42.536285+00:00",
+    "tsjackson-noaa/cf-convention-data": {
+      "hash": "321ff6eb45f8bde1a12ced537daff539c6dead07",
+      "branch": "main (with uncommitted changes)"
+    },
+    "cf-convention/cf-convention.github.io": {
+      "hash": "c370fe91ef209c9f3d033b4bb0cac69a74b7ed72",
+      "branch": "master"
+    },
+    "current_revision": "4",
+    "dataclass": "StandardizedRegion"
+  },
+  "revision_dates": {
+    "1": "2002-12-12",
+    "2": "2013-07-12",
+    "3": "2018-07-11",
+    "4": "2018-12-18",
+    "current": "2018-12-18"
+  },
+  "standardized-region-list": {
+    "atlantic_arctic_ocean": [
+      {
+        "description": "The atlantic_arctic_ocean region comprises the entire geographic region covered by both the Atlantic and Arctic oceans.",
+        "revision_start": 4
+      }
+    ],
+    "indian_pacific_ocean": [
+      {
+        "description": "The indian_pacific_ocean region comprises the entire geographic region covered by both the Indian and Pacific oceans. This is distinct from the indo_pacific_ocean region.",
+        "revision_start": 4
+      }
+    ],
+    "indo_pacific_ocean": [
+      {
+        "description": "A biogeographic region of sea, comprising the tropical waters of the Indian Ocean, the tropical western and central Pacific Ocean, and the seas connecting the two around Indonesia. The indo_pacific_ocean region does not include the temperate and polar regions of the Indian and Pacific oceans, nor the tropical eastern Pacific. This is distinct from the indian_pacific_ocean region.",
+        "revision_start": 1
+      }
+    ]
+  }
+}

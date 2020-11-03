@@ -1,0 +1,94 @@
+{
+  "metadata": {
+    "Conventions": "CF-1.8",
+    "last_modified": "2020-09-07"
+  },
+  "cv": {
+    "axis": [
+      "X", 
+      "Y", 
+      "Z", 
+      "T"
+    ],
+    "calendar": [
+      "gregorian",
+      "proleptic_gregorian",
+      "noleap",
+      "all_leap",
+      "360_day",
+      "julian",
+      "none"
+    ],
+    "cell_measures": [
+      "area",
+      "volume"
+    ],
+    "cell_methods": [
+      "point",
+      "sum",
+      "maximum",
+      "maximum_absolute_value",
+      "median",
+      "mid_range",
+      "minimum",
+      "minimum_absolute_value",
+      "mean",
+      "mean_absolute_value",
+      "mean_of_upper_decile",
+      "mode",
+      "range",
+      "root_mean_square",
+      "standard_deviation",
+      "sum_of_squares",
+      "variance"
+    ],
+    "cf_role": [
+      "timeseries_id",
+      "profile_id",
+      "trajectory_id"
+    ],
+    "featureType": [
+      "point",
+      "timeSeries",
+      "trajectory",
+      "profile",
+      "timeSeriesProfile",
+      "trajectoryProfile"
+    ],
+    "geometry_type": [
+      "point",
+      "line",
+      "polygon"
+    ],
+    "grid_mapping_name": [
+      "albers_conical_equal_area",
+      "azimuthal_equidistant",
+      "geostationary",
+      "lambert_azimuthal_equal_area",
+      "lambert_conformal_conic",
+      "lambert_cylindrical_equal_area",
+      "latitude_longitude",
+      "mercator",
+      "oblique_mercator",
+      "orthographic",
+      "polar_stereographic",
+      "rotated_latitude_longitude",
+      "sinusoidal",
+      "stereographic",
+      "transverse_mercator",
+      "vertical_perspective"
+    ],
+    "positive": [
+      "down",
+      "up"
+    ]
+  },
+  "cv_aliases": {
+    "calendar": {
+      "gregorian": ["standard"],
+      "noleap": ["365_day"],
+      "all_leap": ["366_day"]
+    }
+  }
+}
+
